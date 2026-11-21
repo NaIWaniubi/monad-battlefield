@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>导演台 · MONAD BATTLEFIELD</title>
+    <script type="module" crossorigin src="/assets/director-Dgyi1gE5.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="stylesheet" crossorigin href="/assets/director-029GTz5P.css">
+  </head>
+  <body>
+    <header class="bar">
+      <div class="title">导演台</div>
+      <div class="sub">只在第二个屏幕/平板上开这个页面 · 通过 BroadcastChannel 控制大屏</div>
+      <div class="link" id="status">未连接</div>
+    </header>
+
+    <main>
+      <section class="card show-card">
+        <h2>演出脚本</h2>
+        <div class="row">
+          <button id="runShow" class="primary">▶ 播放 90 秒演示</button>
+          <button id="stopShow">■ 停止</button>
+        </div>
+        <div class="show-progress"><span id="showBar"></span></div>
+        <div class="show-now" id="showNow">待机 · 按播放开始</div>
+      </section>
+
+      <section class="card">
+        <h2>现场控场</h2>
+        <div class="row">
+          <button data-act="fullscreen">全屏切换</button>
+          <button data-act="mute" id="muteBtn">静音 / 开声</button>
+          <button data-act="mode" data-mode="normal" class="on">普通模式</button>
+          <button data-act="mode" data-mode="hype">高能模式</button>
+        </div>
+        <div class="row">
+          <button data-act="start">开场音效</button>
+          <button data-act="end">收尾音效</button>
+          <button data-act="reset" class="danger">清屏（不动链上）</button>
+        </div>
+      </section>
+
+      <!-- v3「静默墙」：全场唯一的稀缺资源是安静。
+           按下去 → 大屏先哑 5.2 秒 → 中继把 240 笔在 0.4s 内轰进链上，
+           大屏同时一声齐鸣 + 一屏涟漪。按钮名写清后果，不留意外。 -->
+      <section class="card">
+        <h2>静默墙 · 爆发</h2>
+        <div class="row">
+          <button data-act="burst" class="primary">⚡ 爆发 · 240 笔齐发</button>
+        </div>
+        <p class="hint">按下后全场安静 5.2 秒，随后一声齐鸣，240 笔交易在半秒内一起涌入。中继有 15 秒冷却，别连点。</p>
+      </section>
+
+      <section class="card">
+        <h2>字幕条</h2>
+        <div class="row">
+          <input id="banner" placeholder="输入一句话，显示在大屏底部" maxlength="80" />
+          <button data-act="banner">推送</button>
+          <button data-act="banner-clear">清除</button>
+        </div>
+        <div class="presets">
+          <button class="chip" data-preset="每一格变色，都是一笔链上交易">每一格变色都是一笔交易</button>
+          <button class="chip" data-preset="此刻每秒 80 笔，40 个独立钱包在打">每秒 80 笔</button>
+          <button class="chip" data-preset="扫码就能抢，不用钱包，不用 gas">扫码参战</button>
+          <button class="chip" data-preset="同样的负载，以太坊主网打不进去">主网打不进去</button>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>中继服务</h2>
+        <div class="stats" id="stats">
+          <div><label>排队</label><b id="s-queued">—</b></div>
+          <div><label>已发</label><b id="s-sent">—</b></div>
+          <div><label>失败</label><b id="s-failed">—</b></div>
+          <div><label>TPS</label><b id="s-tps">—</b></div>
+          <div><label>Key</label><b id="s-keys">—</b></div>
+        </div>
+        <div class="hint">服务未起时这些数字保持 —，不影响大屏。</div>
+      </section>
+
+      <section class="card">
+        <h2>演示检查单</h2>
+        <ul class="checklist">
+          <li>大屏已全屏、音响已接、音量开</li>
+          <li>蜂群在跑（终端里 tps 在跳）</li>
+          <li>中继 queued 有变化（观众能打进来）</li>
+          <li>二维码扫得开（手机流量测一次）</li>
+          <li>fallback 视频已打开在另一个窗口</li>
+        </ul>
+      </section>
+    </main>
+
+  </body>
+</html>

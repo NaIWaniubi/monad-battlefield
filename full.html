@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>MONAD BATTLEFIELD</title>
+    <script type="module" crossorigin src="/assets/main-D_pxkU6k.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/assets/grid-R640YOfD.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-C_24inwf.css">
+  </head>
+  <body>
+    <div id="app">
+      <!-- ── 顶栏：发丝线，无背景块 ─────────────────────── -->
+      <header class="topbar">
+        <div class="mark">
+          <span class="sigil"></span>
+          <span class="wordmark">MONAD<span class="wordmark-thin">BATTLEFIELD</span></span>
+        </div>
+
+        <div class="topbar-meta">
+          <!-- data-signal 由页尾的被动观测器按文字内容维护（live/demo/connecting/error），
+               CSS 据此给圆点着色 —— main.ts 零改动，见 H-hud.log 决策记录。 -->
+          <span class="micro" id="conn" data-signal="connecting">连接中…</span>
+          <span class="hair-v"></span>
+          <span class="micro" id="footer-addr">—</span>
+        </div>
+
+        <div class="controls">
+          <button id="sound" class="ctl" type="button" aria-label="声音">
+            <span class="ctl-dot"></span><span class="ctl-label">声音</span>
+          </button>
+          <button id="fullscreen" class="ctl" type="button" aria-label="全屏">
+            <span class="ctl-label">全屏</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ── 主体：全出血网格 + 右侧量测栏 ──────────────── -->
+      <main>
+        <section class="stage" id="stage">
+          <span class="edge edge-l"><span>REALTIME · PARALLEL EVM</span></span>
+          <span class="edge edge-r"><span>2500 SLOTS · NO GLOBAL COUNTER</span></span>
+          <canvas id="grid"></canvas>
+          <span class="crop tl"></span>
+          <span class="crop tr"></span>
+          <span class="crop bl"></span>
+          <span class="crop br"></span>
+          <!-- 中继失联时才出现。以前中继挂了，大屏毫无反应，
+               而演讲者盯的正是这块屏 —— 观众点了没反应，台上看不出来。 -->
+          <div class="relay-warn" id="relay-warn" hidden>中继失联 · 观众点击不会上链</div>
+
+          <!-- v3「静默墙」：收到 burst 指令那一刻起，中央倒数 5.2 秒。
+               hidden 到指令到达才显示 —— 平时它不存在，不能抢版面的主位。 -->
+          <div class="silence" id="silence" hidden><span id="silence-num">静默 5.2s</span></div>
+          <div class="stage-caption">
+            <span class="micro dim">2500 CELLS</span>
+            <span class="hair-v sm"></span>
+            <span class="micro dim">1 SLOT EACH</span>
+            <span class="hair-v sm"></span>
+            <span class="micro dim" id="rpc-name">—</span>
+          </div>
+        </section>
+
+        <aside class="rail">
+          <!-- 主角数字 -->
+          <div class="block hero">
+            <div class="label">TRANSACTIONS / SEC</div>
+            <!-- 单位必须和数字同级可见：原来的单位是 9.5px 大写等宽字，
+                 配 104px 的数字，投影上那行小字等于不存在 ——
+                 评委看到的就是「一个没有单位的 92」。 -->
+            <div class="hero-num">
+              <span class="display" id="tps">0</span>
+              <span class="display-unit">TX/S</span>
+            </div>
+            <div class="sub" id="tps-sub">等待交易</div>
+          </div>
+
+          <div class="rule"></div>
+
+          <div class="block pair">
+            <div>
+              <div class="label">TOTAL TX</div>
+              <div class="figure" id="total">0</div>
+            </div>
+            <div>
+              <div class="label">ELAPSED</div>
+              <div class="figure" id="elapsed">00:00</div>
+            </div>
+          </div>
+
+          <div class="rule"></div>
+
+          <!-- 领土占比：真实功能，也是最像「精密仪器」的一块 -->
+          <div class="block">
+            <div class="label">TERRITORY</div>
+            <div class="share" id="share"></div>
+          </div>
+
+          <div class="rule"></div>
+
+          <!-- 与以太坊的对照：全屏唯一带颜色的数字，锚定视觉 -->
+          <div class="block">
+            <div class="label">COST IF ON L1</div>
+            <div class="cost-card">
+              <div class="figure accent" id="ethcost">$0</div>
+              <div class="note" id="ethnote">—</div>
+            </div>
+          </div>
+
+          <!-- v3「实时主网账单」：每秒燃烧速率。上面那个是累计额（一个越来越大的字），
+               这一个是正在跳动的速率 —— 燃烧感来自「它每帧都在变」。 -->
+          <div class="block">
+            <div class="label">BURN RATE · LIVE</div>
+            <div class="hero-num">
+              <span class="display" id="burnrate">$0</span>
+              <span class="display-unit">USD/S</span>
+            </div>
+          </div>
+
+          <div class="spacer"></div>
+
+          <div class="qr" id="qrwrap" hidden>
+            <!-- 四角括号：.qr::before/::after 画上面两角，这个层画下面两角（纯 CSS，无 SVG） -->
+            <span class="qr-brk" aria-hidden="true"></span>
+            <img id="qr" alt="扫码参战" />
+            <div class="label center">SCAN TO CLAIM</div>
+            <div class="qr-url" id="qrurl">—</div>
+          </div>
+
+          <!-- 地址只有本机能打开时：不出二维码，改出可执行的修法 -->
+          <div class="qr-bad" id="qrwarn" hidden>
+            <div class="qr-bad-t">二维码不可扫</div>
+            <div class="qr-bad-b">这个地址只有本机能打开，手机扫了会失败：</div>
+            <code class="qr-bad-u" id="qrwarn-url">—</code>
+            <div class="qr-bad-f" id="qrwarn-fix">—</div>
+          </div>
+
+          <div class="ticker" id="claimline">—</div>
+        </aside>
+      </main>
+
+      <div id="banner-bar" aria-live="polite"></div>
+    </div>
+    <!-- H-hud 状态光 / 燃烧强度：纯被动观测器。
+         只做两件事：读 #conn 文本 → 写 data-signal；读 #burnrate 数值 → 写 --burn（0..1，$500 封顶）。
+         CSS 据此上色/调饱和，所有动画仍归 CSS。main.ts 一行未动。
+         拿掉它大屏照常工作 —— 只是状态点退化为 dead/非dead 两色。 -->
+    <script>
+      (function () {
+        var conn = document.getElementById("conn");
+        var burn = document.getElementById("burnrate");
+        if (!conn || !burn) return;
+        function signal(t) {
+          if (!t || t.indexOf("连接中") >= 0) return "connecting";
+          if (t.indexOf("DEMO") >= 0) return "demo";
+          return /未部署|失败|中断|不可用|不可扫/.test(t) ? "error" : "live";
+        }
+        function paint() {
+          conn.dataset.signal = signal(conn.textContent || "");
+          var v = parseFloat((burn.textContent || "").replace(/[^0-9.]/g, ""));
+          var n = isFinite(v) ? Math.max(0, Math.min(1, v / 500)) : 0;
+          document.documentElement.style.setProperty("--burn", String(n));
+        }
+        var mo = new MutationObserver(paint);
+        mo.observe(conn, { childList: true, characterData: true, subtree: true });
+        mo.observe(burn, { childList: true, characterData: true, subtree: true });
+        paint();
+      })();
+    </script>
+  </body>
+</html>
