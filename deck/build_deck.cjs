@@ -77,7 +77,7 @@ function rowItem(s, x, y, w, lead, desc, sqColor) {
 function panel(s, x, y, w, h, color) {
   s.addShape(p.shapes.ROUNDED_RECTANGLE, { x, y, w, h, fill: { color: color || PANEL }, line: { color: LINE, width: 0.6 }, rectRadius: 0.08 });
 }
-const TOTAL = 20;
+const TOTAL = 19;
 
 /* ============ S1 · COVER ============ */
 {
@@ -182,6 +182,31 @@ const TOTAL = 20;
   footer(s, 4, TOTAL);
 }
 
+/* ============ S2C · 界面画廊(多图) ============ */
+{
+  const s = slide();
+  kickerTitle(s, "产品实拍 · 四个界面", "大屏、手机、裁判台、验证页 —— 全是真页面", 28);
+  const shots = [
+    ["大屏主视图", "2500 格 / 实时 TPS / 四阵营领土", "live-demo.png"],
+    ["手机参战页", "无钱包 · 无 gas · 点一下即发交易", "final-join-tapped.png"],
+    ["裁判台 Director", "阵营配比 / 起停 / 预算熔断", "final-director.png"],
+    ["到场证明 Verify", "输地址 → 命中格子 / 区块 / tx", "final-verify.png"],
+  ];
+  const cw = 5.95, ch = 2.35, gx = 0.35, gy = 0.3;
+  shots.forEach((sh, i) => {
+    const col = i % 2, row = (i / 2) | 0;
+    const x = M + col * (cw + gx), y = 1.72 + row * (ch + gy + 0.42);
+    const fp = __dirname + "/../docs/screenshots/" + sh[2];
+    panel(s, x, y, cw, ch, "120E1F");
+    if (fs.existsSync(fp)) {
+      s.addImage({ path: fp, x: x + 0.07, y: y + 0.07, w: cw - 0.14, h: ch - 0.14 });
+    }
+    s.addText(sh[0], { x, y: y + ch + 0.06, w: cw, h: 0.3, fontFace: SANS, fontSize: 11.5, color: TEXT, bold: true, margin: 0 });
+    s.addText(sh[1], { x, y: y + ch + 0.34, w: cw, h: 0.3, fontFace: SANS, fontSize: 9.5, color: MUTED, margin: 0 });
+  });
+  footer(s, 5, TOTAL);
+}
+
 /* ============ S3 · WHY MONAD(能力 + 致谢) ============ */
 {
   const s = slide();
@@ -215,7 +240,7 @@ const TOTAL = 20;
   s.addText("说句实话", { x: 7.25, y: 5.52, w: 5.3, h: 0.3, fontFace: SANS, fontSize: 12, color: ACCENT, bold: true, margin: 0 });
   s.addText("我们没跑到 Monad 的极限 —— 先撞到的是自己的余额与车道数。这恰恰说明:链还有余量,瓶颈在我们这边。", { x: 7.25, y: 5.84, w: 5.3, h: 0.8, fontFace: SANS, fontSize: 11, color: TEXT, margin: 0 });
   s.addText("谢谢 Monad Blitz 广州 —— 给了我们一天时间,和一个真的能把并行跑给你看的平台。", { x: M, y: 6.62, w: CW, h: 0.34, fontFace: SANS, fontSize: 13, color: "C4B5FD", bold: true, align: "center", margin: 0 });
-  footer(s, 5, TOTAL);
+  footer(s, 6, TOTAL);
 }
 
 /* ============ S4 · WHAT THE FLOOR LOOKS LIKE ============ */
@@ -242,7 +267,7 @@ const TOTAL = 20;
     { text: "如实区分:", options: { bold: true, color: ACCENT } },
     { text: " 本图满屏密度为合成层(顶栏已标 DEMO);真实点击、同块 17 方、revert 计费才是链上实证(见 P6)。", options: { color: MUTED } },
   ], { x: M, y: 6.52, w: CW, h: 0.4, fontFace: SANS, fontSize: 12.5, margin: 0 });
-  footer(s, 6, TOTAL);
+  footer(s, 7, TOTAL);
 }
 
 /* ============ S5 · PLATFORM PHYSICS ============ */
@@ -284,7 +309,7 @@ const TOTAL = 20;
     { text: "琥珀 = 实测 16;紫 = 理论 14.2;灰紫 = 配置目标,从未以实测口径宣称。", options: {} },
   ], { x: 6.55, y: 6.0, w: 6.25, h: 0.35, fontFace: SANS, fontSize: 12.5, color: MUTED, margin: 0 });
   s.addText("数据来源:swarm-live.log(前 30s 253 笔被节点接受、0 失败,均值 8.4 tx/s;第 253 笔后撞限速墙)", { x: 6.55, y: 6.42, w: 6.25, h: 0.5, fontFace: SANS, fontSize: 11.5, color: "6B6485", margin: 0 });
-  footer(s, 7, TOTAL);
+  footer(s, 8, TOTAL);
 }
 
 /* ============ S6 · ON-CHAIN EVIDENCE ============ */
@@ -315,28 +340,6 @@ const TOTAL = 20;
   links.forEach((t, i) => {
     s.addText(t, { x: M, y: 5.6 + i * 0.42, w: CW, h: 0.4, fontFace: SANS, fontSize: 12.5, color: i === 1 ? TEXT : MUTED, margin: 0 });
   });
-  footer(s, 8, TOTAL);
-}
-
-/* ============ S7 · VS PRIOR EDITIONS ============ */
-{
-  const s = slide();
-  kickerTitle(s, "06 · 和往届的区别", "不是又一个像素画板(vs 像素战争 #363)");
-  const hdr = { fontFace: SANS, fontSize: 14, color: TEXT, bold: true, fill: { color: PANEL2 }, valign: "middle" };
-  const lab = { fontFace: SANS, fontSize: 14, color: PRIMARY, bold: true, fill: { color: PANEL }, valign: "middle" };
-  const cellA = { fontFace: SANS, fontSize: 13, color: MUTED, fill: { color: BG }, valign: "middle" };
-  const cellB = { fontFace: SANS, fontSize: 13.5, color: TEXT, fill: { color: PANEL }, valign: "middle" };
-  s.addTable([
-    [{ text: "", options: lab }, { text: "合约式冷却玩法(往届常见)", options: hdr }, { text: "Monad Battlefield", options: { ...hdr, color: ACCENT } }],
-    [{ text: "计费", options: lab }, { text: "冷却写进合约:被拒的点击照样扣 gas,真金白银打水漂", options: cellA }, { text: "claim 零拒绝 + 服务端代付:每一分钱都变成确认;revert 计费实测可查", options: cellB }],
-    [{ text: "呈现", options: lab }, { text: "比美的静态像素画板", options: cellA }, { text: "声画同步的「并行示波器」:四阵营四声部,声音本身就是 TPS", options: cellB }],
-    [{ text: "深度", options: lab }, { text: "跑个 demo、讲个体验", options: cellA }, { text: "实测报告:量化 Monad 的 reserve-balance 平台物理曲线", options: cellB }],
-  ], { x: M, y: 1.7, w: CW, colW: [1.3, 5.3, 5.73], rowH: [0.5, 0.95, 0.95, 0.95], border: { pt: 0.75, color: LINE }, margin: 0.08 });
-  s.addText([
-    { text: "诚实备注:", options: { bold: true, color: ACCENT } },
-    { text: " ①/③ 的 A/B 对照实测(冷却被拒计费 vs 零拒绝代付)正在由并行小组定稿,见 docs/ab-result.json + EVIDENCE §5 —— 提交前更新,本页不预填数字。", options: { color: MUTED } },
-    { text: " ② 满屏密度为合成层(顶栏标 DEMO),链上实证以 P6 为准。", options: { color: MUTED } },
-  ], { x: M, y: 5.65, w: CW, h: 0.9, fontFace: SANS, fontSize: 12.5, margin: 0, paraSpaceAfter: 4 });
   footer(s, 9, TOTAL);
 }
 
@@ -492,26 +495,6 @@ function vsTable(s, headers, rows, y0) {
   footer(s, 15, TOTAL);
 }
 
-/* ============ S13 · 我们认输的三行(可信度杠杆) ============ */
-{
-  const s = slide();
-  kickerTitle(s, "诚实条款", "有三件事,他们确实比我们强", 28);
-  const rowsB = [
-    ["散场之后", "十一秒是 DAO 现在就需要装的升级安全层;我们的墙价值集中在今天这场", "所以我们把它做成可复制的到场证明引擎,而非声称日常刚需"],
-    ["线上真交易", "半衰期有真实 USDC 在售、7×24 服务", "我们的『真实』全押在链上可查:373 笔落块每笔能点开"],
-    ["工程展示面", "半衰期的五件套+三道CI 曾是这个系列赛场的天花板", "本赛场今天起我们同样具备:CI 四道绿 + 证据自动化 + 事件日时间线"],
-  ];
-  rowsB.forEach((r, i) => {
-    const y = 1.62 + i * 1.34;
-    s.addShape(p.shapes.RECTANGLE, { x: M, y: y + 0.04, w: 0.14, h: 1.0, fill: { color: MUTED }, line: { type: "none" } });
-    s.addText(r[0], { x: M + 0.35, y, w: 2.2, h: 0.5, fontFace: SANS, fontSize: 15, color: MUTED, bold: true, margin: 0 });
-    s.addText(r[1], { x: M + 0.35, y: y + 0.42, w: 7.6, h: 0.85, fontFace: SANS, fontSize: 12.5, color: TEXT, margin: 0, valign: "top" });
-    s.addText(r[2], { x: 8.5, y: y + 0.05, w: 4.3, h: 1.1, fontFace: SANS, fontSize: 12, color: ACCENT, margin: 0, valign: "top" });
-  });
-  s.addText("认输三行,是为了让你相信前面三页的每一行数字。", { x: M, y: 5.9, w: CW, h: 0.5, fontFace: SANS, fontSize: 18, color: TEXT, bold: true, align: "center", margin: 0 });
-  footer(s, 16, TOTAL);
-}
-
 /* ============ S13B · 独占能力矩阵(五条硬指标,三家公开材料都没有) ============ */
 {
   const s = slide();
@@ -544,7 +527,7 @@ function vsTable(s, headers, rows, y0) {
   s.addText("他们各有一块最硬的:安全产品(十一秒)· 真实支付(半衰期)· 单写者不变式(Blockwise)。", { x: M, y: 5.42, w: CW, h: 0.42, fontFace: SANS, fontSize: 15, color: MUTED, align: "center", margin: 0 });
   s.addText("这五条 + 那三块能拼在同一张桌上的,只有我们。", { x: M, y: 5.86, w: CW, h: 0.45, fontFace: SANS, fontSize: 20, color: ACCENT, bold: true, align: "center", margin: 0 });
   s.addText("— = 其公开仓库/材料未见,不以「未见」断言其不存在。数据:docs/BENCH-EVENT17.md + EVIDENCE.md", { x: M, y: 6.42, w: CW, h: 0.35, fontFace: SANS, fontSize: 10.5, color: "6B6485", align: "center", margin: 0 });
-  footer(s, 17, TOTAL);
+  footer(s, 16, TOTAL);
 }
 
 /* ============ S14 · DEMO VIDEO ============ */
@@ -569,7 +552,7 @@ function vsTable(s, headers, rows, y0) {
     s.addText(pt[0], { x: 10.28, y, w: 2.6, h: 0.34, fontFace: SANS, fontSize: 13.5, color: TEXT, bold: true, margin: 0 });
     s.addText(pt[1], { x: 10.28, y: y + 0.34, w: 2.6, h: 0.72, fontFace: SANS, fontSize: 10.5, color: MUTED, margin: 0, valign: "top" });
   });
-  footer(s, 18, TOTAL);
+  footer(s, 17, TOTAL);
 }
 
 /* ============ S15 · VERIFY GOLDEN ============ */
@@ -594,7 +577,7 @@ function vsTable(s, headers, rows, y0) {
   });
   s.addText("MerkleDistributor 原语:26 条测试全绿,链上部署待 gas(透明标注)", { x: 6.9, y: 5.2, w: 5.9, h: 0.5, fontFace: SANS, fontSize: 11, color: MUTED, margin: 0 });
   s.addText("合约验证领取 · 防重领 · 任何人可重算根", { x: 6.9, y: 5.6, w: 5.9, h: 0.4, fontFace: SANS, fontSize: 11, color: TEXT, margin: 0 });
-  footer(s, 19, TOTAL);
+  footer(s, 18, TOTAL);
 }
 
 /* ============ S10 · CLOSING ============ */
@@ -609,7 +592,7 @@ function vsTable(s, headers, rows, y0) {
   s.addText("真落块 373 笔 · 同块 17 EOA · 实测峰值 16 tx/s —— 全部链上可查", { x: M, y: 4.62, w: CW, h: 0.4, fontFace: SANS, fontSize: 13.5, color: MUTED, align: "center", margin: 0 });
   s.addText("落格 ALIGHT · 谢谢 Monad Blitz 广州", { x: M, y: 5.42, w: CW, h: 0.5, fontFace: SANS, fontSize: 16, color: PRIMARY, bold: true, align: "center", charSpacing: 2, margin: 0 });
   s.addText("并行不是我们发明的,是 Monad 给的前提 —— 我们只是把它变成了一场看得见的活动。", { x: M, y: 5.95, w: CW, h: 0.4, fontFace: SANS, fontSize: 12.5, color: "C4B5FD", align: "center", margin: 0 });
-  footer(s, 20, TOTAL);
+  footer(s, 19, TOTAL);
 }
 
 p.writeFile({ fileName: __dirname + "/monad-battlefield.pptx" }).then(() => console.log("DECK WRITTEN"));
