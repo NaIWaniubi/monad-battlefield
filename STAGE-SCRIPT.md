@@ -23,7 +23,8 @@
 
 ## 台上 30 秒检查
 - [ ] PPT 停在 S1;确认能翻到 S3 并播放视频(点视频中央播放键)
-- [ ] 视频播放失败 → 直接开 `https://monabattlefield.pages.dev/?demo=1` 现场跑(LE 不花 gas)
+- [ ] 视频播放失败 → 直接开 `https://monabattlefield.pages.dev/?demo=1` 现场跑(不花 gas)
+- ⚠️ 时间漂移:verify 录屏锚定的旧窗口已滑出"最近 6000 块"。**若要现场 live verify**,先补气发 1 笔新 claim(或让中继 fund),再用 2000 块窗口查**刚发 claim 的地址**;否则播录屏。
 - [ ] 手机热点兜底;verify live 版超时就播 S15 录屏并说"这是刚才的实测"
 
 ## 别做

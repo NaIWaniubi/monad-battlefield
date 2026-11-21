@@ -29,7 +29,10 @@ mojo.devnads.com/events/18  (项目 id=456,已提交 pending)
               (单块 17 笔 claim,来自 17 个不同 EOA)
 观众端到端 tx  https://testnet.monadscan.com/tx/0x36f2c5ea66d949cccadf936f2c06b5d2e6a976b4f9e50248323c9c7ad3ac8536
 revert 计费实证 0x6194609f8e93385698c501510b7aba7a5b09f520b12bfda002e2c8dcffcb4ec8
-真结算 tx      (结算脚本输出,现场以终端实际 hash 为准)
+真结算 #1      0xd09b90251adec25098db13339a1cc53f32246033f9bbe0c52a06c70565f7fde5  (0.006666 MON, block 81534262)
+真结算 #2      0xd773135df013a6e9f6e2b78df2eee8a011f5ffd9d5c52890298db3cd266b5714  (0.006666 MON, block 81534268)
+真结算 #3      0x62a11b9fae1f6c59421d1c084f060705673601ee8e6bfb5e653e4031363fa4dc  (0.006668 MON, block 81534278)
+verify 演示地址 0x3470b1aEb06d28145b37DFE7d77190196a79ecb8  (窗口填 5000,命中 3 笔:#321/#1111/#1234)
 ```
 
 ## 一条 curl 复现并行物证
