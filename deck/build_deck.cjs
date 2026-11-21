@@ -182,27 +182,32 @@ const TOTAL = 19;
   footer(s, 4, TOTAL);
 }
 
-/* ============ S2C · 界面画廊(多图) ============ */
+/* ============ S2C · 界面画廊(多图,等比) ============ */
 {
   const s = slide();
   kickerTitle(s, "产品实拍 · 四个界面", "大屏、手机、裁判台、验证页 —— 全是真页面", 28);
+  // PNG 尺寸探针(IHDR),保证等比放置不拉伸
+  const pngSize = (fp) => { const b = fs.readFileSync(fp); return { w: b.readUInt32BE(16), h: b.readUInt32BE(20) }; };
   const shots = [
-    ["大屏主视图", "2500 格 / 实时 TPS / 四阵营领土", "live-demo.png"],
+    ["大屏主视图", "2500 格 · 实时 TPS · 四阵营领土", "final2-demo.png"],
     ["手机参战页", "无钱包 · 无 gas · 点一下即发交易", "final-join-tapped.png"],
     ["裁判台 Director", "阵营配比 / 起停 / 预算熔断", "final-director.png"],
     ["到场证明 Verify", "输地址 → 命中格子 / 区块 / tx", "final-verify.png"],
   ];
-  const cw = 5.95, ch = 2.35, gx = 0.35, gy = 0.3;
+  const cw = 6.0, ch = 2.42, gx = 0.33, gy = 0.18, capH = 0.34;
   shots.forEach((sh, i) => {
     const col = i % 2, row = (i / 2) | 0;
-    const x = M + col * (cw + gx), y = 1.72 + row * (ch + gy + 0.42);
-    const fp = __dirname + "/../docs/screenshots/" + sh[2];
+    const x = M + col * (cw + gx), y = 1.66 + row * (ch + gy);
     panel(s, x, y, cw, ch, "120E1F");
+    const fp = __dirname + "/../docs/screenshots/" + sh[2];
     if (fs.existsSync(fp)) {
-      s.addImage({ path: fp, x: x + 0.07, y: y + 0.07, w: cw - 0.14, h: ch - 0.14 });
+      const d = pngSize(fp);
+      const bw = cw - 0.2, bh = ch - capH - 0.24;
+      const k = Math.min(bw / d.w, bh / d.h);
+      const iw = d.w * k, ih = d.h * k;
+      s.addImage({ path: fp, x: x + (cw - iw) / 2, y: y + 0.1 + (bh - ih) / 2, w: iw, h: ih });
     }
-    s.addText(sh[0], { x, y: y + ch + 0.06, w: cw, h: 0.3, fontFace: SANS, fontSize: 11.5, color: TEXT, bold: true, margin: 0 });
-    s.addText(sh[1], { x, y: y + ch + 0.34, w: cw, h: 0.3, fontFace: SANS, fontSize: 9.5, color: MUTED, margin: 0 });
+    s.addText(sh[0] + "  ·  " + sh[1], { x: x + 0.16, y: y + ch - capH - 0.02, w: cw - 0.32, h: capH, fontFace: SANS, fontSize: 10.5, color: "C4B5FD", bold: true, margin: 0, valign: "middle" });
   });
   footer(s, 5, TOTAL);
 }
