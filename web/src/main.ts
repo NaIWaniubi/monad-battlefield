@@ -559,7 +559,7 @@ async function pollRelay() {
   if (!s) {
     // 连续 2 次（约 6s）连不上才报警：单次抖动是正常的
     relayFails++;
-    if (relayFails >= 2) elRelayWarn.hidden = false;
+    if (relayFails >= 2 && !DEMO) elRelayWarn.hidden = false; // 演示模式:合成流不需要中继,别挂红条
     return;
   }
   if (relayFails >= 2) elRelayWarn.hidden = true;
