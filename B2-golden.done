@@ -1,0 +1,79 @@
+# B2-golden.done — 中继补气 + 真实 claim + 三张金证据
+完成时间：2026-11-21 16:58（系统实测；16:38 接手，用时 20 分钟）。距 18:30 截止约 1h31m。
+
+## 结论一句话
+中继已不是「没气」状态：8 个 key 全部有余额（dryKeys=0）、/api/claim 走 sync 回执真上链；三张图重拍完毕，**verify 出了 2 行真实结果**（这正是之前的破绽所在）。
+
+## 1. 补气清单（总转账 0.06 MON = 红线；gas 0.00693；deployer 净支出 0.06693）
+| # | relayer 地址 | 补前 → 补后 | tx hash | 区块 |
+|---|---|---|---|---|
+| #1 | 0xf447cCbF50D9aDA73426E1A6fC9Beea978E2695C | 0 → 0.0200 | 0x60ba45ce47623fc8bc9a66854a97925762292771a01002a06b17bdabd0062c30 | 81532436 |
+| #7 | 0x41B8C5053ee96b8a067551322c591B4bAF57E392 | 0 → 0.0200 | 0x6b77c254a9a38bb2e1f1f572e3fb34df8ad1bdad8885a150448d6d2a71d6b2d0 | 81532443 |
+| #0 | 0x3470b1aEb06d28145b37DFE7d77190196a79ecb8 | 0.00104 → 0.02104 | 0x72c442e13a3084fecbbceabc32bfe71119dafd0e5f46696f7cfbcd8c2cff8672 | 81532449 |
+- legacy、gasPrice 110 gwei、gas 21000、3 笔全 success。deployer：0.140420628 → 0.073490628。
+
+## 2. 真实 claim（全部 confirmed=true，来自 /api/claim 的同步回执）
+| # | cell | faction | nick | 发送者（relayer 地址） | tx hash | block |
+|---|---|---|---|---|---|---|
+| A | 1234 | 2 | 金证据1 | 0x3470b1aEb06d28145b37DFE7d77190196a79ecb8 | 0xe0fcf384b94e171d975dc130211d966d0bd3875ac0c9912ac03cde6a6a41f1cf | 81532618 |
+| B | 777 | 3 | 金证据2 | 0xf447cCbF50D9aDA73426E1A6fC9Beea978E2695C | 0x114305733fdf8391fbecbb88dfe48556be7640fa9d06b7d5449ddd801d73de12 | 81532640 |
+| D | 1111 | 3 | 金证据4 | 0x3470b1aEb06d28145b37DFE7d77190196a79ecb8 | 0xf5e8999103fd7c71e8a912111f5377f6df8d2c9b20e04d0e83b8005af85a9182 | 81533232 |
+| E | 2222 | 2 | 金证据5 | 0xf447cCbF50D9aDA73426E1A6fC9Beea978E2695C | 0x1eb92047a6b776f2192bada352fa2169bca5e2b4dd4f228bf514ff560e058ee7 | 81533259 |
+| T | 1078 | 2 | 金证据观众（join.html 真点击） | 0x41B8C5053ee96b8a067551322c591B4bAF57E392 | 0x966c83fb4147cd4b5ee69f7cd921aa02083e708ee0546afcfac6f1d34ad8a5ac | 81534073 |
+| G | 321 | 1 | 金证据7 | 0x3470b1aEb06d28145b37DFE7d77190196a79ecb8 | 0xf73538823054f60dbfda41719d36194c54286751f4319e88cc138752169aa5ff | 81534565 |
+| H | 654 | 2 | 金证据8 | 0xf447cCbF50D9aDA73426E1A6fC9Beea978E2695C | 0x44662b2e6173228a7e270ddf8ecacd3529a04e1b47803511a4ea2ed8a907d5a3 | 81534567 |
+| I | 987 | 3 | 金证据9 | 0x41B8C5053ee96b8a067551322c591B4bAF57E392 | 0x76df591fd7ec6f8032b6c3e953571b0281425d0151877157647d1fe1e97d0d73 | 81534570 |
+
+未上链（无 gas 消耗）：cell 999 遇公共 RPC 429（只试 1 次）；cell 3333 是我把格号填越界（网格 0..2499），input 校验拒掉。
+
+## 3. /api/stats 终值（17:06）
+`sent=3, failed=0, dryKeys=0, keys=8, occupied=3, claims=3, confirmLatencyP50=799ms, P95=917ms, count=3`
+→ **dryKeys=0 ✓、sent≥2 ✓**
+
+## 4. 三张图（docs/screenshots/）
+| 文件 | 尺寸/大小 | 状态 |
+|---|---|---|
+| `docs/screenshots/final-real.png` | 1600×900 / 976,314 B | 顶栏 `已同步 · 经中继 · 3 笔`，场上有 3 个真实格，P50 0.8s |
+| `docs/screenshots/final-verify.png` | 680×900 / 55,213 B | **金证据：命中 2 笔** |
+| `docs/screenshots/final-join-tapped.png` | 390×844@2x / 142,561 B | `#1078 ✓ 已上链 · block #81534073`，无红横幅 |
+
+## 5. 顶栏原文（逐字）
+- final-real：`已同步 · 经中继 · 3 笔`（绿点）；右侧 `TOTAL TX 12`、`tap→confirm P50 0.8s · P95 0.9s · 近 3 笔`、`TERRITORY 33% 33% 33% 0%`、`COST IF ON L1 $238`、`TX/S 0 等待交易…`
+- 对照：之前那张是 `回放至 #… · 已同步 0 笔` —— 0 已消失。
+
+## 6. verify 结果行（逐字，地址填 0x3470b1aEb06d28145b37DFE7d77190196a79ecb8，窗口 2000）
+- 总结：`命中 2 笔 claim（地址 0x3470b1…79ecb8）`；页头 `#81,533,965 / 468ms · Monad Testnet 10143`（绿点）
+- 行1：`#1111 第 23 行 · 第 12 列 琥珀 heat 1 块 #81,533,232 0xf5e89991…f85a9182`
+- 行2：`#1234 第 25 行 · 第 35 列 青 heat 3 块 #81,532,618 0xe0fcf384…6a41f1cf`
+→ **有结果行，可点 MonadScan 核对；之前的「最近 2000 块内没有该地址的 claim」已彻底消除。**
+
+## 7. join 页（手机视口 390 宽）
+- `#1078 ✓ 已上链 · block #81534073 · 本次…`（末尾「确认 0.9s」被 CSS 省略号截断，成功态明确）
+- 横幅：无（banner=null，红条「链上通道暂满…」不再出现）；错误条：无；`已占领 3`；`今日 1`；无横向溢出（navW=380/390）
+- 选完阵营后 #pick 区折叠为 0 高度是页面自身设计，不是截图问题
+
+## 8. 必须知道的代价与风险（重要）
+1. **relayer 又被我花薄了**：每笔真实 claim ≈ 0.0061 MON。16:57 复测余额：i0 0.00268 / i1 0.00164 / i2 0.00104 / i3 0.005 / i4-i6 0.00608 / i7 0.00776。除 i7 外**都发不出下一笔**（门槛 0.00612）。上台前若还要观众扫码点格，必须先 `npm run fund`（或换 RELAYER_KEYS）。
+2. **deployer 只剩 0.033690628**：我 16:42 结束时是 0.073490628，16:57 复测变 0.033690628 —— 中间约 0.0398 MON **不是我花的**（本任务只在 16:41 发过 3 笔）。同时段有别的进程在动 deployer，补气前先确认余额。
+3. 大屏只回放最近 100 块（LOG_WINDOW=100，约 40-50 秒）：**重启中继或等一会儿，版图会回到接近空**。要演示「有真实流量」，必须在开演前几十秒内重发若干笔 claim（我这套脚本可复用：`b2tmp/live-real.mjs`）。
+4. 页面 `TOTAL TX` 是「历史+订阅」的累加器，会比「已同步 N 笔」大（本次 12 vs 3），两个数字不同源，被问起就按此解释；别拿 TOTAL TX 当「在线人数」。
+5. 公共 RPC 会 429：本轮遇到 3 次（sendRawTransaction / getTransactionCount / getLogs），每次只影响单笔，未重试超过 2 次。
+
+## 9. 复用命令（下一轮补气/重拍）
+```bash
+# 1) 补气（viem，legacy 110gwei gas21000，每 key 0.02）
+#    deployer 私钥来自 .env PRIVATE_KEY / .deployer.json
+# 2) 起中继（把有钱的 key 排前面，避免 round-robin 撞到粉尘 key）
+RELAYER_KEYS="$(node -e 'const k=require("./.relayers.json");process.stdout.write([k[0],k[1],k[7],k[2],k[3],k[4],k[5],k[6]].join(","))')" \
+  node --env-file-if-exists=.env server/index.mjs
+# 3) 前端
+npx vite --config web/vite.config.ts --host 127.0.0.1
+# 4) 截图脚本（在 workspace 的 b2tmp/，用 monad-recon 的 playwright-core + 本机 Chrome）
+node b2tmp/live-real.mjs url=http://127.0.0.1:5180/ out=.../final-real.png
+node b2tmp/verify.mjs url=http://127.0.0.1:5180/verify.html addr=0x3470b1aEb06d28145b37DFE7d77190196a79ecb8 out=.../final-verify.png
+node b2tmp/join.mjs  url=http://127.0.0.1:5180/join.html  out=.../final-join-tapped.png
+```
+
+## 10. 收尾
+- 中继、vite 均已杀；8791 / 5180 无 LISTENING。
+- 未改任何源码 / .relayers.json / .env；只写了三张图 + B2-golden.log / B2-golden.done + 中继日志 B2-golden-relay{1..4}.log。

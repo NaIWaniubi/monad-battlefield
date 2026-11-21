@@ -1,0 +1,39 @@
+A2-settle DONE  (UTC 2026-11-21T08:57:48Z / 北京 16:57:48, 距 18:30 截止约 1h32m)
+deadline 2026-11-21T18:30+08:00
+
+files:
+  scripts/settle.mjs   (rewritten: pure JS, 0 TS casts, node --check OK)
+  docs/EVIDENCE.md     (new §6 真结算: 6.1..6.6)
+  docs/RUNBOOK.md      (§4.2 收尾动作:结算)
+  README.md            (evidence row "Participation → real payout")
+  package.json         ("settle" script)
+
+commands:
+  node --check scripts/settle.mjs                      -> OK
+  node scripts/settle.mjs --window 8000                -> dry-run EXIT 0
+  npm run settle -- --window 8000                      -> dry-run EXIT 0 (alias verified)
+  node scripts/settle.mjs --pot 100 --from ...         -> guard EXIT 1, no tx
+  node scripts/settle.mjs --bogus                      -> EXIT 1 "未知参数"
+  fixed range re-run 81472000..81479200                -> 362 / 21 / 紫 109 (identical)
+
+real settlement: 0.02 MON -> top3 of 362 claims / 21 wallets
+  #1 0x00a25f950ad95bc2ee79b3114dc3b29e04645d20  0.006666666666666666  blk 81534262
+     tx 0xd09b90251adec25098db13339a1cc53f32246033f9bbe0c52a06c70565f7fde5
+  #2 0x22008cc023897f3cdc926c3356a5da3f9dfa2977  0.006666666666666666  blk 81534268
+     tx 0xd773135df013a6e9f6e2b78df2eee8a011f5ffd9d5c52890298db3cd266b5714
+  #3 0x398a26471d4c8cd2d3927881cb009f89d6a23c2e  0.006666666666666668  blk 81534278
+     tx 0x62a11b9fae1f6c59421d1c084f060705673601ee8e6bfb5e653e4031363fa4dc
+
+independent verification (raw JSON-RPC, not the script):
+  all 3 receipts status=0x1, type=0x0 (legacy), gas=gasUsed=60000, gasPrice=110 gwei
+  recipient balance delta at receipt block = exactly +0.00666666666666666x each
+  deployer ledger closes: 0.073490628 - 0.02 - 3*0.0066 = 0.033690628 (0 wei drift)
+
+not committed (no commit requested). settle-run.log holds raw run output.
+caveats:
+  - window 8000 does NOT contain the demo burst -> settled on fixed range instead (documented in §6.1/6.6)
+  - !! all 3 recipients are our OWN swarm lanes (.bots.json), not audience. Real audience left only
+    5 claims / 4 addresses in the range (max 2 each) -> mechanism proof, NOT audience income.
+    Disclosed in EVIDENCE §6.6 + README row. Use --to <addr> if you need to pay a real audience member.
+  - top 17 wallets tied at 21 claims each (357 = 21*17), +5 from 4 organic addrs = 362. Tie-break = address lexicographic
+  - payout is by contribution rank, not by winning faction

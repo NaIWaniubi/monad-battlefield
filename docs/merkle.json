@@ -1,0 +1,60 @@
+{
+  "generatedAt": "2026-11-21T08:57:16.527Z",
+  "chainId": 10143,
+  "source": {
+    "contract": "0xd525ef7ee4072e80765fd61633d80322040afd9d",
+    "event": "Claim(uint16 indexed id, address indexed who, uint8 color, uint32 heat)",
+    "topic0": "0x34096f49d042317834b90c387b35a6771a44c30e06dc5f2b6354116c4c6154a9"
+  },
+  "scan": {
+    "fromBlock": 81527319,
+    "toBlock": 81535318,
+    "blocks": 8000,
+    "chunk": 100,
+    "logs": 8,
+    "contributorsFound": 3,
+    "included": 3,
+    "top": 32,
+    "note": "全部贡献者入树"
+  },
+  "poolMon": "0.01",
+  "poolWei": "10000000000000000",
+  "totalWei": "10000000000000000",
+  "totalContributions": 8,
+  "includedContributions": 8,
+  "root": "0x5aa5cf34a951bd1e3674fd7a542239a42f67709207341567ad1c0b3faf881b9c",
+  "leaves": [
+    {
+      "index": 0,
+      "account": "0x3470b1aEb06d28145b37DFE7d77190196a79ecb8",
+      "amountWei": "3750000000000000",
+      "amountMon": "0.003750 MON",
+      "contributions": 3,
+      "proof": [
+        "0x7347f6a2cf564ed8609044c14cd3e1cda81796de45cd3b249367de963d5a2e26",
+        "0xc37ca2aa97e33b170c6c9b232ab4f0aaf09598aebb85eeca2b8288ac5686a150"
+      ]
+    },
+    {
+      "index": 1,
+      "account": "0x41B8C5053ee96b8a067551322c591B4bAF57E392",
+      "amountWei": "2500000000000000",
+      "amountMon": "0.002500 MON",
+      "contributions": 2,
+      "proof": [
+        "0xfc0fa3a9359685aa742753ac77c5a92adbce1541c440c8af8d385548442509d0",
+        "0xc37ca2aa97e33b170c6c9b232ab4f0aaf09598aebb85eeca2b8288ac5686a150"
+      ]
+    },
+    {
+      "index": 2,
+      "account": "0xf447cCbF50D9aDA73426E1A6fC9Beea978E2695C",
+      "amountWei": "3750000000000000",
+      "amountMon": "0.003750 MON",
+      "contributions": 3,
+      "proof": [
+        "0x1de8d71e589c31860102744db2817dd48b5233d834cfe80a84c71cacf2c2fc0b"
+      ]
+    }
+  ]
+}

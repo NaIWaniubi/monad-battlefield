@@ -1,0 +1,47 @@
+# M-merkle.done — Merkle 分账结算（合约验证领取）
+
+STATUS: **BLOCKED_NO_GAS** — 离线交付全部完成；链上部署与 claim 待 gas（coordinator 17:06 裁决：不动 bot 钱包，保持降级交付）。
+完成时间：2026-11-21 17:08（系统时间；距 18:30 截止约 1h22m）
+
+## 交付物（全部真实文件，未碰 Battlefield.sol/server/web/其它 scripts）
+| 文件 | 内容 |
+|---|---|
+| contracts/MerkleDistributor.sol | 67 行；setRoot(root,total) payable（owner-only，注入奖池）/ claim(index,account,amount,proof) / isClaimed(root,index) / 手写排序拼接 _verify（无 OZ）|
+| scripts/merkle-core.mjs | leaf=keccak256(abi.encode(index,account,amount))；排序拼接内部哈希；奇数晋升；按贡献分池（余数给 index0）|
+| scripts/merkle-env.mjs | .env 兜底 + --arg 解析 |
+| scripts/merkle-build.mjs | 扫真实 Claim 事件 → 贡献统计 → 前 N 名分池 → docs/merkle.json；写盘前重算 root + 逐条验 proof |
+| scripts/merkle-deploy.mjs | solc-js 编译 + 部署；--set-root 先重算 root/验全 proof 再 setRoot 注入 0.01 MON |
+| scripts/merkle-claim.mjs | --proof-index N：本地验 proof → 链上 root 比对 → isClaimed 查重 → simulate → claim；--dry 不发交易 |
+| tests/merkle.test.ts | 26 条性质测试 |
+| docs/MERKLE-SETTLEMENT.md | 一页原语说明：信任模型对比/机制/安全边界/真实数据/恢复步骤（顶部有「离线验证完成、链上部署待 gas」横幅）|
+| docs/merkle.json | 真实扫链产物：root + 3 leaves + proof（1829 B）|
+| deployments-merkle.json | status=blocked_no_gas，含 address:null、真实 root、gas 数字、缺口、恢复命令 |
+
+## 真实验证输出
+- `npx vitest run tests/merkle.test.ts` → **Test Files 1 passed (1) / Tests 26 passed (26) / Duration 3.22s**
+  覆盖：叶子数 1/2/3/5/8/32 全自证；篡改 amount/account/index/root、截断/加长 proof、cross-claim 全失败；
+  分配金额和===奖池、比例向下取整、乱序不影响 root；出货 docs/merkle.json 从 leaves 重算 root 一致 + 每条 proof 可验 + 金额守恒；
+  leafHash 与手写 pad32 ABI 编码逐字节一致；hashPair 顺序无关。
+- solc 0.8.38（optimizer runs=1, cancun）：abi 14 项，runtime 1297 B，initcode 1347 B，合约 67 行（≤70）。
+- `node --check` 5 个脚本全 OK。
+- 真实扫链（Monad Testnet 10143，16:57）：窗口 81,527,319→81,535,318（8000 块，100 块/片×80 片）
+  → 8 笔 Claim / 3 贡献者 → root `0x5aa5cf34a951bd1e3674fd7a542239a42f67709207341567ad1c0b3faf881b9c`
+  → 0.00375 / 0.0025 / 0.00375 MON，金额和 === 0.01 MON 奖池。
+- claim --dry（#0/#1）：proof 2 项本地验证通过，calldata 228 B。
+
+## 链上部分（如实记录：没有就是没有）
+- 合约地址：**无（未部署，不填假值）**
+- claim tx：**无（未实弹，只到 dry-run）**
+- 本切片花费：**0 wei**（部署脚本的余额闸在发送前拒发，0 交易）
+- 阻塞原因：16:50 deployer 0.073490628 MON；16:53 并行切片 A2-settle 真实结算消耗 0.0398 → 余 0.033690628 MON。
+  单次部署实测 estimateGas=337,014 @102 gwei（链上 base fee，非估算）= **0.034375 MON > 余额**。
+  完整演示（部署+奖池 0.01+2 笔 claim）≈0.0554 MON，缺口≈**0.0217 MON**。
+- 恢复命令（补 ≥0.025 MON 后 5 分钟可完成）：
+  `node scripts/merkle-deploy.mjs` → `node scripts/merkle-deploy.mjs --set-root` → `node scripts/merkle-claim.mjs --proof-index 0` → `--proof-index 1`
+
+## 不敢保证的地方
+1. **TDD 纪律缺口**：merkle-core 先写、测试后写，首跑即绿，本切片没有 Red 证据；不冒充红过。
+2. 合约**没有在真实链上执行过一次**：claim 成功、防重领 revert、tampered proof revert 均只有逻辑推理与 JS 性质测试支撑，未做链上实弹。
+3. root 发布者仍是信任点（选贡献集与比例）；合约只保证发布后不可篡改/不可重领/钱只进 leaf.account。文档 §5 已写明。
+4. 「前 32 名入树」逻辑未被大数据量压测：本次窗口只有 3 个贡献者，proof 深度 1-2。
+5. 任务给的 0.025 MON 预算与 Monad 实测 102 gwei 不相容：任何此规模合约的单次部署下限约 0.033-0.041 MON（同仓 Battlefield 历史部署 201,966 gas = 0.0206 MON 可佐证）。预算模型建议按 0.06 MON/轮修正。

@@ -1,0 +1,42 @@
+node_modules/
+dist/
+
+# ── 密钥与本地配置：绝对不能进公开仓库 ──────────────
+.env
+.env.local
+web/.env
+.bots.json
+# 8 个中继钱包的私钥在这里。曾经漏配过这一行 —— 提交公开仓库等于把私钥发出去。
+.relayers.json
+.relayers.json.bak
+# 部署者私钥（pk 字段）。同样漏配过，而且是 `git add -A` 时被一起带进去的。
+.deployer.json
+.deployer.json.bak
+*.key
+*.pem
+secrets*
+
+# 构建产物（可由 npm run build:contract 重新生成）
+contracts/artifacts/
+# 注意：deployments.json 不忽略 —— 里面只有公开的合约地址/区块号，
+# 提交它公开仓库才能直接跑起来（没有它中继会进「未部署」模式）。
+
+# ── 日志与临时物 ─────────────────────────────────
+*.log
+gate.log
+shots/
+.zcode/
+
+# 多代理集群协调脚手架（心跳 log 已被 *.log 挡，这里挡 manifest/patrol/done），
+# 属临时编排物，不进公开仓库。
+docs/recon-progress/
+.team/
+
+# 编辑器 / 系统
+.DS_Store
+Thumbs.db
+*.swp
+
+# 缓存清理器改名的死树与 wrangler 缓存
+node_modules_dead*/
+.wrangler/

@@ -1,0 +1,36 @@
+{
+  "name": "monad-battlefield",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build:contract": "tsx scripts/build.ts",
+    "deploy": "node --env-file-if-exists=.env --import tsx scripts/deploy.ts",
+    "keys": "node --env-file-if-exists=.env --import tsx scripts/keys.ts",
+    "fund": "node --env-file-if-exists=.env --import tsx scripts/fund.ts",
+    "swarm": "node --env-file-if-exists=.env --import tsx scripts/swarm.ts",
+    "relay": "node --env-file-if-exists=.env server/index.mjs",
+    "test": "vitest run",
+    "dev": "vite --config web/vite.config.ts",
+    "build:web": "vite build --config web/vite.config.ts",
+    "preview": "vite preview --config web/vite.config.ts",
+    "venue": "node scripts/venue.mjs",
+    "settle": "node --env-file-if-exists=.env scripts/settle.mjs",
+    "test:ci": "npx vitest run"
+  },
+  "dependencies": {
+    "pptxgenjs": "^4.0.1",
+    "qrcode": "^1.5.4",
+    "viem": "^2.21.45"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@types/qrcode": "^1.5.4",
+    "solc": "^0.8.28",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vite": "^5.4.11",
+    "vitest": "^2.1.9",
+    "wrangler": "^4.166.0"
+  }
+}

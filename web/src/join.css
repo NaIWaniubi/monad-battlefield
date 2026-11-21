@@ -1,0 +1,486 @@
+/* ═══════════════════════════════════════════════════════════════
+   MONAD BATTLEFIELD · 观众页（手机）
+   与主屏共用一套设计语言：深底、发丝线、等宽小字、单一强调色。
+   手机优先：单手可达，点击目标 ≥ 52px。
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --void: #05060a;
+  --void-2: #080a11;
+  --ink: #eef1f7;
+  --ink-2: #a8b0c2;
+  --ink-3: #6e778d;
+  --ink-4: #525b75;
+  --hair: rgba(255, 255, 255, 0.075);
+  --hair-2: rgba(255, 255, 255, 0.14);
+  --accent: #ffb020;
+
+  --f1: #8b7bd8;
+  --f2: #4a9db5;
+  --f3: #c9a227;
+  --f4: #b5525f;
+
+  --f-sans: "Inter", -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+html, body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: var(--void);
+  color: var(--ink);
+  font-family: var(--f-sans);
+  -webkit-font-smoothing: antialiased;
+  overscroll-behavior: none;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(120% 50% at 50% -8%, rgba(90, 120, 190, 0.11), transparent 60%),
+    radial-gradient(90% 40% at 50% 110%, rgba(255, 176, 32, 0.045), transparent 60%);
+  z-index: 0;
+}
+
+#app {
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: calc(env(safe-area-inset-top, 0px) + 12px) 14px
+           calc(env(safe-area-inset-bottom, 0px) + 10px);
+  gap: 10px;
+}
+
+/* ── 顶栏 ───────────────────────────────────────── */
+
+#hud {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--hair);
+  flex: 0 0 auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.2em;
+  color: var(--ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.brand .dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent);
+  flex: 0 0 auto;
+  transform: rotate(45deg);
+}
+
+.meters { display: flex; align-items: center; gap: 12px; flex: 0 0 auto; }
+
+.meter { display: flex; align-items: baseline; gap: 5px; white-space: nowrap; flex: 0 0 auto; }
+
+.meter .k {
+  font-family: var(--f-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+}
+
+.meter .v {
+  font-family: var(--f-mono);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+.meter .u { font-family: var(--f-mono); font-size: 8.5px; color: var(--ink-4); }
+
+/* ── 横幅 ───────────────────────────────────────── */
+
+.banner {
+  flex: 0 0 auto;
+  font-family: var(--f-mono);
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: #ffc9c9;
+  border-left: 2px solid #b5525f;
+  padding: 7px 10px;
+  background: rgba(181, 82, 95, 0.10);
+  line-height: 1.4;
+}
+
+.banner[hidden] { display: none; }
+
+/* ── 阵营选择 ───────────────────────────────────── */
+
+#pick {
+  flex: 0 0 auto;
+  transition: opacity 0.25s, max-height 0.3s;
+  max-height: 140px;
+}
+
+body.has-faction #pick {
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.pick-title {
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.16em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  margin-bottom: 9px;
+}
+
+.factions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+.faction {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  height: 62px;
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid var(--hair-2);
+  border-radius: 2px;
+  color: var(--ink-3);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  cursor: pointer;
+  transition: border-color 0.16s, background 0.16s, color 0.16s, transform 0.08s;
+}
+
+.faction:active { transform: scale(0.97); }
+
+.faction .sw { width: 18px; height: 2px; background: currentColor; }
+.faction .nm { color: var(--ink-2); }
+.faction .tick { display: none; }
+
+.faction.f1 { color: var(--f1); }
+.faction.f2 { color: var(--f2); }
+.faction.f3 { color: var(--f3); }
+.faction.f4 { color: var(--f4); }
+
+.faction.on {
+  border-color: currentColor;
+  background: color-mix(in srgb, currentColor 12%, transparent);
+}
+
+.faction.on .tick {
+  display: block;
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  font-size: 10px;
+  color: currentColor;
+}
+
+.faction.on .nm { color: var(--ink); }
+
+/* ── 战场 ───────────────────────────────────────── */
+
+#stage {
+  flex: 1 1 auto;
+  min-height: 0;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+canvas#grid {
+  display: block;
+  touch-action: none;
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px var(--hair);
+}
+
+.cooldown {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--f-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  color: var(--ink-3);
+  background: rgba(5, 6, 10, 0.86);
+  padding: 8px 14px;
+  pointer-events: none;
+}
+
+.cooldown[hidden] { display: none; }
+
+/* ── 空棋盘提示 ───────────────────────────────────
+   不是装饰：会场最先扫码的几个人看到一块纯黑格子就会退出去，
+   而「第一下点击」是整个演示的启动条件。 */
+.empty-hint {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 15px 18px;
+  text-align: center;
+  pointer-events: none;
+  background: rgba(5, 6, 10, 0.78);
+  border-left: 2px solid var(--accent);
+  max-width: 88%;
+}
+
+.empty-hint[hidden] { display: none; }
+
+.empty-hint b {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ink);
+  letter-spacing: 0.02em;
+}
+
+.empty-hint span {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+/* ── 底部 ───────────────────────────────────────── */
+
+.foot {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 9px;
+  border-top: 1px solid var(--hair);
+  font-family: var(--f-mono);
+  font-size: 9.5px;
+  letter-spacing: 0.1em;
+  color: var(--ink-4);
+  min-height: 30px;
+}
+
+.foot .last {
+  text-align: right;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── 错误 ───────────────────────────────────────── */
+
+.err {
+  position: fixed;
+  left: 14px;
+  right: 14px;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 58px);
+  padding: 11px 13px;
+  background: rgba(5, 6, 10, 0.95);
+  border-left: 2px solid #b5525f;
+  color: #ffc9c9;
+  font-size: 13px;
+  line-height: 1.45;
+  z-index: 30;
+}
+
+.err[hidden] { display: none; }
+
+.pop { animation: pop 0.22s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes pop {
+  from { transform: translateY(6px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.shake { animation: shake 0.32s cubic-bezier(0.36, 0.07, 0.19, 0.97); }
+@keyframes shake {
+  10%, 90% { transform: translateX(-1px); }
+  30%, 70% { transform: translateX(2px); }
+  50% { transform: translateX(-3px); }
+}
+
+/* ── 紧凑屏 ─────────────────────────────────────── */
+
+@media (max-height: 680px) {
+  #app { gap: 7px; }
+  .faction { height: 52px; }
+  .pick-title { margin-bottom: 6px; }
+}
+/* ── 顶栏在窄屏的收敛：品牌只留标记，数字优先 ─────── */
+
+@media (max-width: 430px) {
+  .brand {
+    font-size: 0;          /* 只保留图形标记，避免和各组数字抢宽度 */
+    letter-spacing: 0;
+    gap: 0;
+  }
+  .brand .dot {
+    width: 8px;
+    height: 8px;
+  }
+  .meters { gap: 10px; }
+  .meter { gap: 4px; }
+  .meter .k { font-size: 8px; letter-spacing: 0.1em; }
+  .meter .v { font-size: 12px; }
+  .meter .u { display: none; }
+}
+
+/* 极窄屏：把“排队”让给前两组，保证不换行 */
+@media (max-width: 340px) {
+  .meters .meter:nth-child(3) { display: none; }
+}
+
+/* ── 棋盘坐标说明：把留白变成「仪器面板」 ─────────── */
+
+.board-caption {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: var(--f-mono);
+  font-size: 8.5px;
+  letter-spacing: 0.18em;
+  color: var(--ink-4);
+  text-transform: uppercase;
+  padding: 2px 0 4px;
+}
+
+.board-caption .sep {
+  width: 1px;
+  height: 8px;
+  background: var(--hair-2);
+}
+
+/* 顶栏数字再让一点空间，避免「我方 紫」贴在一起 */
+.meter + .meter { padding-left: 10px; border-left: 1px solid var(--hair); }
+
+@media (max-width: 430px) {
+  #stage { padding: 6px 0; }
+}
+
+/* ── 字体回退修正 ─────────────────────────────────
+   等宽西文字体（Plex Mono / Menlo）没有中文字形，
+   中文会回退到系统 CJK 字体，其字宽和等宽字体不一致 →
+   排版算出的宽度小于实际字形宽度，视觉上就会叠字。
+   所以：凡可能含中文的元素，一律用无衬线体。 */
+
+.meter .v,
+.faction .nm,
+#tip,
+#last,
+.banner,
+.err {
+  font-family: var(--f-sans);
+}
+
+.meter .v {
+  /* 中文不要用 600/700：无对应字重时浏览器会合成加粗（笔画重绘），
+     小字号下看起来像叠字。400 + 略大字号反而更清晰。 */
+  font-weight: 400;
+  font-size: 14px;
+  letter-spacing: 0.02em;
+  font-variant-numeric: tabular-nums;
+}
+
+.faction .nm {
+  letter-spacing: 0.04em;
+  font-weight: 500;
+}
+
+/* ── 领土占比条：填掉棋盘外的竖向留白 ─────────────── */
+
+.share {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 7px 16px;
+  padding: 10px 2px 2px;
+  border-top: 1px solid var(--hair);
+  margin-top: 2px;
+}
+
+.share-row {
+  display: grid;
+  grid-template-columns: 1fr 30px;
+  align-items: center;
+  gap: 8px;
+}
+
+.share-bar {
+  height: 2px;
+  background: rgba(255, 255, 255, 0.05);
+  position: relative;
+  overflow: hidden;
+}
+
+.share-fill {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 0;
+  transition: width 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.share-num {
+  font-family: var(--f-mono);
+  font-size: 9px;
+  color: var(--ink-4);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── v3「人肉车道」的观众代号输入 ─────────────────────
+ * 与其它 meter 并排但保持低调：它是随手的身份，不该抢阵营的注意力。
+ * 触摸目标 ≥ 34px（手指点击），字号不缩到看不见。 */
+.meter-nick .k {
+  font-family: var(--f-sans);
+}
+.nick-in {
+  width: 92px;
+  min-height: 34px;
+  padding: 0 8px;
+  border: 1px solid var(--hair-2);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--ink);
+  font-size: 13px;
+  letter-spacing: 0.02em;
+  text-align: center;
+  outline: none;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.nick-in:focus {
+  border-color: rgba(168, 85, 247, 0.7);
+  background: rgba(168, 85, 247, 0.06);
+}

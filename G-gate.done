@@ -1,0 +1,16 @@
+# G-GATE 门禁结果 · 2026-11-21 16:33（距提交截止约 1h57m）
+1 tsc --noEmit       PASS  exit=0 无输出
+2 vitest run         PASS  exit=0 Test Files 18 passed (18) / Tests 296 passed (296) 全绿
+3 npm run build:web  PASS  exit=0 产 4 页：dist/index.html join.html director.html verify.html（verify.html 6.11 kB）
+4 check-secrets.mjs  PASS  exit=0 "干净：136 个已跟踪文件里没有密钥。"
+5 budget.mjs         PASS  exit=0 reserve 模型合理：满储备道(≥10 MON/道, 2 tps/道) 与 限速道(<10 MON/道, 0.83 tps/道) 两档分开；含 "满打 80 tx/s 需要 40 道 × ≥10 MON = 400 MON 储备" 提示；对当前 8 道 0.0253 MON 如实报缺口
+6 node --check       PASS  server/index.mjs exit=0；scripts/venue.mjs exit=0
+7 grep 口径抽查      字面 FAIL(1命中) / 语义 PASS —— docs/SUBMISSION.md:16 被 "实测.*80" 命中；逐字符核查：首个 "实测"(char 183) 后最近的 "80" 是区块号 79578040 的第 5-6 位数字；"80 tx/s"(char 731) 全文仅 1 处且句式为 "80 tx/s 只是配置目标（…）从未以实测口径宣称"。README.md 0 命中；"打不进去" "变串行" 0 命中。所有 80 均以 target/配置目标口径出现，无违规文案
+=> 总判定：语义全绿；第 7 项为正则误报，文本无需改动。若门禁脚本坚持"零命中"，改 regex（如 实测[^。]{0,30}80[ ]tx/s 且排除"从未/不/非"否定语境），别改文档
+--- 额外发现（不在 7 项清单内，建议主控顺手修）---
+文档残留旧测试数 "143 条单测 / 7 files"，实际现为 296 tests / 18 files：
+  README.md:170  "143 unit tests (7 files)"
+  README.md:200  "(143 tests total, per vitest run)"
+  README.md:223  "tests/ 143 unit tests"
+  docs/SUBMISSION.md:20  "143 条单测"
+  docs/SUBMISSION.md:40  "143 unit tests"

@@ -1,0 +1,101 @@
+# E0-1 · CI —— 门禁自动化（本地干跑过的步骤才会出现在这里）
+#
+# 设计决定与实测依据（2026-11-21 本机干跑）：
+#   · npm ci：package-lock.json 173/173 条 resolved 全部指向
+#     registry.npmjs.org，无 @org 私包 → 无凭据的公共 runner 可装。
+#   · 不跑 forge：环境未装 foundry，仓库契约路线是 solc-js
+#     （npm run build:contract，devDeps 里的 solc 0.8.28），README 已如实写明。
+#   · 契约编译/前端构建/类型检查/单测/密钥扫描全部本地绿过再进 CI，
+#     具体输出贴在 .team/board.md 的 BUILD 段。
+#
+# evidence job（E1-2）：仅 main 分支 push；失败不弄红 CI（continue-on-error），
+# 产物 docs/EVIDENCE.auto.md 由机器人回写提交（GITHUB_TOKEN 的 push 不会再触发
+# workflow，无回环）。
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  # 同一分支的新 PR push 取消旧 run；main 上的 run 跑完为止（evidence 会回写提交）
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        # 单点矩阵：将来要横向对比 LTS 直接扩成 [20, 22, 24]。
+        # 注意 check 名 = "build-test (24)"，docs/CI.md 的分支保护命令与此对齐。
+        node-version: [24]
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install (npm ci, public registry only)
+        run: npm ci
+
+      - name: Type check
+        run: npx tsc --noEmit
+
+      - name: Build contract (solc-js)
+        run: npm run build:contract
+
+      - name: Unit tests (vitest)
+        run: npx vitest run
+
+      - name: Build web
+        run: npm run build:web
+
+      - name: Secret scan
+        run: node scripts/check-secrets.mjs
+
+  # ── E1-2 · 链上证据自动化：仅 main push。任何一步失败都不许弄红 CI ──
+  evidence:
+    needs: build-test
+    if: "github.event_name == 'push' && github.ref == 'refs/heads/main'"
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: write # 回写 docs/EVIDENCE.auto.md 需要
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # evidence.mjs 只用 node 内置模块 + 全局 fetch，故意不跑 npm ci ——
+      # 少一层依赖面 = RPC 可达就能出证据，与依赖安装解耦。
+
+      - name: Collect on-chain evidence (non-fatal)
+        id: evidence
+        continue-on-error: true
+        run: node scripts/evidence.mjs
+
+      - name: Publish docs/EVIDENCE.auto.md
+        # always()：即便上面失败也进来 —— git diff 发现无变化就安静退出，
+        # 有半成品文件也照样把「生成于…」的时间戳发出去，这是证据自动化的意义。
+        if: always()
+        continue-on-error: true
+        run: |
+          if git diff --quiet -- docs/EVIDENCE.auto.md; then
+            echo "EVIDENCE.auto.md 无变化，跳过提交"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs/EVIDENCE.auto.md
+          git commit -m "ci(evidence): auto-refresh on-chain evidence [skip ci]"
+          git push origin HEAD:main

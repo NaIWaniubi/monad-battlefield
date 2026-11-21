@@ -1,0 +1,25 @@
+{
+  "status": "blocked_no_gas",
+  "reason": "deployer 余额 0.033691 MON < 部署预估 0.034375 MON（337014 gas @102 gwei）。奖池 0.01 + 2 笔 claim ≈0.011 MON 亦无着落。余额在 16:53 被 A2-settle 真实结算消耗 0.0398 MON（0.0735→0.0337）；此前 16:50 实测 0.0735。",
+  "address": null,
+  "deployer": "0x17FF85c1D82AEDd1da887406a307d087C5Cda61e",
+  "chainId": 10143,
+  "root": "0x5aa5cf34a951bd1e3674fd7a542239a42f67709207341567ad1c0b3faf881b9c",
+  "treeFile": "docs/merkle.json",
+  "runtimeBytes": 1297,
+  "estimatedDeployGas": "337014",
+  "estimatedDeployCostWei": "34375428000000000",
+  "poolWei": "10000000000000000",
+  "estimatedClaimsCostWei": "11000000000000000",
+  "estimatedTotalWei": "55375428000000000",
+  "balanceWei": "33690628000000000",
+  "shortfallWei": "21684800000000000",
+  "compiledWith": "solc 0.8.38, optimizer runs=1, evmVersion=cancun",
+  "resume": [
+    "给 deployer 补 ≥0.025 MON（缺口 0.0217）",
+    "node scripts/merkle-deploy.mjs",
+    "node scripts/merkle-deploy.mjs --set-root",
+    "node scripts/merkle-claim.mjs --proof-index 0",
+    "node scripts/merkle-claim.mjs --proof-index 1"
+  ]
+}

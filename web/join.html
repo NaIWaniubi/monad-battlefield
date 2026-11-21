@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#07050F" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <title>参战 · MONAD BATTLEFIELD</title>
+    <link rel="stylesheet" href="/src/join.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header id="hud">
+        <div class="brand"><span class="dot"></span>MONAD BATTLEFIELD</div>
+        <div class="meters">
+          <div class="meter">
+            <span class="k">我方</span>
+            <span class="v" id="m-faction">未选</span>
+          </div>
+          <div class="meter">
+            <span class="k">今日</span>
+            <span class="v" id="m-mine">0</span><span class="u">格</span>
+          </div>
+          <div class="meter">
+            <span class="k">排队</span>
+            <span class="v" id="m-queue">–</span>
+          </div>
+          <!-- v3「人肉车道」的观众代号：默认自动生成，可改。
+               随每次 claim 提交 → 中继写进该格标签 → 大屏署名墙上出现你的名字。 -->
+          <div class="meter meter-nick">
+            <span class="k">代号</span>
+            <input
+              id="nick"
+              class="nick-in"
+              type="text"
+              maxlength="16"
+              spellcheck="false"
+              autocomplete="off"
+              aria-label="观众代号，会显示在大屏上"
+            />
+          </div>
+        </div>
+      </header>
+
+      <div id="banner" class="banner" hidden></div>
+
+      <section id="pick" aria-label="选择阵营">
+        <div class="pick-title">选阵营 · 再点格子抢地盘</div>
+        <div class="factions" id="factions" role="radiogroup" aria-label="阵营"></div>
+      </section>
+
+      <section id="stage">
+        <canvas id="grid" aria-label="50×50 战场，点击格子占领"></canvas>
+        <!-- 空棋盘不是「坏了」，是「还没人开始」。
+             会场最先扫码的几个人如果只看到一块黑格子，就不会点第一下。 -->
+        <div class="empty-hint" id="empty-hint" hidden>
+          <b>还没有人占领</b>
+          <span>点任意一格，你的阵营就从那里开始</span>
+        </div>
+        <div class="cooldown" id="cooldown" hidden></div>
+      </section>
+
+      <div class="board-caption">
+        <span>50 × 50</span>
+        <span class="sep"></span>
+        <span>2500 CELLS</span>
+        <span class="sep"></span>
+        <span>已占领 <b id="m-occupied">—</b></span>
+        <span class="sep"></span>
+        <span>ON-CHAIN</span>
+      </div>
+
+      <div class="share" id="share" aria-label="领土占比"></div>
+
+      <div class="foot">
+        <span id="tip">点哪格抢哪格</span>
+        <span id="last" class="last"></span>
+      </div>
+
+      <div id="err" class="err" role="alert" hidden></div>
+    </div>
+
+    <noscript>
+      <p style="padding: 24px; color: #fda4af; text-align: center">这个页面需要 JavaScript。</p>
+    </noscript>
+
+    <script type="module" src="/src/join.ts"></script>
+  </body>
+</html>

@@ -1,0 +1,72 @@
+:root {
+  --void: #05060a;
+  --ink: #eef1f7;
+  --ink-2: #a8b0c2;
+  --ink-3: #6e778d;
+  --ink-4: #525b75;
+  --hair: rgba(255, 255, 255, 0.075);
+  --hair-2: rgba(255, 255, 255, 0.14);
+  --accent: #ffb020;
+  --f-sans: "Inter", -apple-system, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --f-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0; min-height: 100%; background: var(--void); color: var(--ink);
+  font-family: var(--f-sans); -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(100% 50% at 50% -10%, rgba(90,120,190,0.09), transparent 60%),
+    radial-gradient(80% 40% at 50% 110%, rgba(255,176,32,0.04), transparent 60%);
+}
+body { padding: 16px 20px 40px; position: relative; z-index: 1; }
+.bar {
+  display: grid; grid-template-columns: auto 1fr auto; align-items: baseline;
+  gap: 14px; padding-bottom: 12px; border-bottom: 1px solid var(--hair);
+}
+.title { font-size: 12px; font-weight: 600; letter-spacing: 0.3em; }
+.sub { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: 0.1em; color: var(--ink-4); }
+.link { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-3); }
+main { display: grid; grid-template-columns: repeat(auto-fit, minmax(330px, 1fr)); gap: 0; margin-top: 4px; }
+.card { padding: 18px 20px 20px 0; border-bottom: 1px solid var(--hair); border-right: 1px solid var(--hair); }
+.card:nth-child(2n) { padding-left: 20px; }
+.card h2 {
+  margin: 0 0 14px; font-family: var(--f-mono); font-size: 9px; letter-spacing: 0.24em;
+  text-transform: uppercase; color: var(--ink-4); font-weight: 400;
+}
+.row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 10px; }
+button {
+  font-family: var(--f-mono); font-size: 10.5px; letter-spacing: 0.1em; color: var(--ink-2);
+  background: none; border: 1px solid var(--hair-2); border-radius: 2px; padding: 9px 13px;
+  cursor: pointer; transition: color .16s, border-color .16s, background .16s;
+}
+button:hover { color: var(--ink); border-color: var(--ink-3); background: rgba(255,255,255,0.03); }
+button.on { color: var(--ink); border-color: var(--accent); background: rgba(255,176,32,0.10); }
+button.danger { color: #d99aa4; border-color: rgba(181,82,95,0.5); }
+button.danger:hover { background: rgba(181,82,95,0.12); color: #ffc9c9; }
+.primary { color: #ffd08a; border-color: rgba(255,176,32,0.55); background: rgba(255,176,32,0.10); font-weight: 500; }
+.primary:hover { background: rgba(255,176,32,0.20); border-color: var(--accent); }
+input {
+  flex: 1; min-width: 150px; font-family: var(--f-sans); font-size: 12px; color: var(--ink);
+  background: rgba(0,0,0,0.35); border: 1px solid var(--hair-2); border-radius: 2px; padding: 9px 11px;
+}
+input::placeholder { color: var(--ink-4); }
+input:focus { outline: none; border-color: var(--ink-3); }
+.presets { display: flex; gap: 6px; flex-wrap: wrap; }
+.chip { font-size: 10px; padding: 6px 9px; color: var(--ink-3); border-color: var(--hair); }
+.show-progress { height: 1px; background: var(--hair); margin: 12px 0 9px; overflow: hidden; }
+#showBar { display: block; height: 100%; width: 0; background: var(--accent); transition: width .25s linear; }
+.show-now { font-family: var(--f-mono); font-size: 9.5px; letter-spacing: .05em; color: var(--ink-3); min-height: 15px; line-height: 1.5; }
+.stats { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; }
+.stats label { display: block; font-family: var(--f-mono); font-size: 8.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink-4); margin-bottom: 4px; }
+.stats b { font-family: var(--f-mono); font-size: 19px; font-weight: 400; font-variant-numeric: tabular-nums; color: var(--ink); letter-spacing: -0.02em; }
+.hint { margin-top: 10px; font-family: var(--f-mono); font-size: 9px; letter-spacing: .06em; color: var(--ink-4); }
+.checklist { margin: 0; padding: 0; list-style: none; font-size: 12.5px; line-height: 2; color: var(--ink-2); }
+.checklist li::before { content: "□"; margin-right: 9px; color: var(--ink-4); font-family: var(--f-mono); }
+@media (max-width: 760px) {
+  main { grid-template-columns: 1fr; }
+  .card, .card:nth-child(2n) { padding: 16px 0; border-right: 0; }
+  .stats { grid-template-columns: repeat(3, 1fr); }
+}

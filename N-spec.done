@@ -1,0 +1,36 @@
+N-spec 心跳 · 2026-11-21 16:56（北京时间）
+状态：DONE
+任务：中继 nonce 队列正式规格 + 并发性质测试（零链上 gas，未发任何交易）
+
+交付文件：
+- server/nonce-queue.mjs（新，纯函数模块，未改 server/index.mjs）
+- tests/nonce-queue.prop.test.ts（新，11 个测试 = 4 性质 + 7 契约边角）
+- docs/RELAY-SPEC.md（新，状态机 + I1-I4 不变式 + Monad 语义 + 失败模式表 + 尖锐边角）
+
+接线结论：未接线。迁移 k.pending/k.nextNonce 需同时改 pickRelayer/totalPending/
+/health/stats/resyncTimer 等 6+ 处，超出「≤40 行且语义等价」门槛；
+server/index.mjs 保持原状（git status 验证：仅 3 个新文件）。
+
+验证（真实输出）：
+- node --check server/nonce-queue.mjs && node --check server/index.mjs -> NODE_CHECK_OK
+- npx tsc --noEmit -> TSC_OK
+- npx vitest run tests/nonce-queue.prop.test.ts ->
+  Test Files 1 passed (1)；Tests 11 passed (11)
+
+性质覆盖（每条 200 个种子 × 120 事件，任务下限 50 种子）：
+- P1 (纪元内严格+1、在途无重复): seeds=200，acquires=12136
+- P2 (回退精确贴合链上/只前进/在途跳过): seeds=200，rollbackResync=510，
+  forwardResync=192，skippedResync=2530
+- P3 (pending 非负且与在途等价): seeds=200，每事件后检查（24000 事件/性质）
+- P4 (排空+回退后无永久空洞): seeds=200，每序列末 3 key 各检查一次
+- 观测量：staleAssign=36，rejectedStale=48（回退后链上跳变的已知代价，已写入
+  RELAY-SPEC §6 S1；不是并发重复）
+
+已知不敢保证：
+1. 生产代码未被这些测试直接覆盖（模块未接线，语义等价靠人工逐行比对 §1 映射表）。
+2. 模型里的「节点接收」是简化：真实节点对同 nonce 不同内容、reserve 不足、
+   replacement 规则更复杂；RELAY-SPEC §6 已列为限制。
+3. P1 的「全局永不重复」在回退语义下不成立，测试只断言纪元内 +1 与在途无重复；
+   若后续要更强保证，需要在 acquire 前用链上值做闸门（当前实现没有）。
+4. 测试文件为 TS 但 tsconfig include 不含 tests/，tsc 只覆盖 scripts/web；
+   测试由 vitest 运行（esbuild 转译），未做独立类型检查。

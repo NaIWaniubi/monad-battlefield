@@ -1,0 +1,39 @@
+# S-shot.done — S-G 终局审核截图
+完成时间：2026-11-21 16:34（系统实测时间，非任务里说的 17:30；距 18:30 截止还有约 1h56m，远在 25 分钟预算内完成）
+
+## 截图清单（docs/screenshots/，全部覆盖旧名）
+| 文件 | 大小 | 状态 |
+|---|---|---|
+| final-demo.png | 1,118,459 B (1.07 MB) | 可用·最佳 |
+| final-real.png | 873,549 B (0.83 MB) | 可用但空屏（见下） |
+| final-verify.png | 54,072 B | 可用（无结果行，非金证） |
+| final-join.png | 49,562 B | 带黄旗横幅（见下） |
+| final-join-tapped.png | 45,231 B | 带双错误提示（见下） |
+| final-director.png | 75,323 B | 可用 |
+
+## 服务
+- `node --env-file-if-exists=.env server/index.mjs`：起，/health = {"ok":true,"rpc":true,"block":81530142,"occupied":0}
+- `npx vite --config web/vite.config.ts --host 127.0.0.1`：起，5180 返 200
+- 收尾：两个进程均已杀，8791/5180 端口已清空。
+
+## 顶栏文案逐字抄录
+- **final-demo.png**：`● DEMO · 合成打底 + 真实点击  |  DEMO MODE · 2500 CELLS · SYNTHETIC + ON-CHAIN`
+- **final-real.png**：`● 回放至 #81530360 · 已同步 0 笔  |  CONTRACT 0xD525…FD9D · 2500 CELLS · MONAD TESTNET`
+  （注意：是「回放至」+ 已同步 **0** 笔，不是「实时」，也不是「已同步 N」）
+
+## 逐张目检
+1. **final-demo.png** — 无黑屏、无报错 overlay、无文字溢出。署名小字旗（单字「阿/两/微/佛/九…」）与四色辉光清晰，240 人铺满网格、Territory 22/25/26/27% 均衡，COST IF ON L1 $23,542 高亮框到位。**唯一小遗憾**：右侧 TPS=0 TX/S + 「等待交易…」，DEMO 模式要真点才有速率，静态图上略显“没跑起来”。右下二维码被视口裁掉，属正常（1600×900）。
+2. **final-real.png** — 版式/文案正确，但战场**接近全空**：已同步 0 笔、0 占领，只剩底纹与微弱星点，且已切到「回放至」态。视觉上是全场最弱的一张，台上单放这张会被问“链上没人吗”。
+3. **final-verify.png** — 版式干净、无溢出、无报错。**无结果行 → 不是金证**：填 0xffF48c7929914Fb83CF53984c3b62Ac4e0A1232e 扫描完成后页面提示原文为
+   「最近 2000 块内没有该地址的 claim / 本次扫描窗口：块 81,528,640 → 81,530,639（2,000 块 / 40 次 getLogs，每块区间公共节点硬限 ≤100 块，本页面取 50）。合约自块 79,333,331 部署以来的更早历史不在本页扫描范围。若这笔 claim 是刚点的：链上索引有延迟，等 10~30 秒再点一次「验证」。」
+   顶部 `#81,530,692 / 285ms · Monad Testnet 10143` 绿点正常。首轮 12s 拍时还在「扫描中… 24/40 个区块窗口」，已改等扫描跑完再拍。
+4. **final-join.png / final-join-tapped.png** — 390 宽无横向溢出、阵营四格排布正常。但两张都挂着红色横幅 **「链上通道暂满 · 你的点击已记下 · 可找工作人员续气」**（join.ts DRY_BANNER，触发条件是 /api/stats 的 dryKeys>0）。拍完选「紫」点中心格 2s 后：`已占领 0`，底部报错 **「上链失败 · 再点一次」**，`#m-faction=紫`、队列 0。
+   服务端原因（日志原文，不是截图问题）：8 个中继钱包里 relayer#1/#7 启动即「没有 gas —— 暂时停用」，`2/8 个中继钱包没有 gas —— 跑 npm run fund 或用 RELAYER_KEYS 换一批`；实际发送报 `Signer had insufficient balance`，`/api/claim` 返回 **502**。即“点格上链”这条路当下是坏的。
+5. **final-director.png** — 无黑屏无报错，四栏（演出脚本/现场控场/静默墙/字幕条）+ 演示检查单 + 中继服务指标全渲染，右上「中继在线」绿字。中继计数显示 `排队0 已发0 失败1 TPS0 KEY8`（失败1 来自上面那笔 502）。下方大片留白，构图偏空但可接受。
+
+## 其它观测
+- 控制台错误：demo 与 join 各有一条资源加载失败（demo=404、join=502，502 即 /api/claim）；real / verify / director 无 console error，四张页面均无 vite-error-overlay。
+- 未改任何代码。
+
+## 总评（这套图配 v6 能不能上台）
+**能上台，但要换主次**：final-demo 和 final-director 直接可用，final-verify 可作为“透明可核对”的说明图（它证明的是工具真的去扫链，而不是摆拍）。两处必须知道的风险——final-real 显示「已同步 0 笔」的空战场、final-join 两张带「链上通道暂满 / 上链失败 · 再点一次」——本质是同一个根因：中继钱包 gas 耗尽（dryKeys=2/8），导致观众点格上不了链、大屏也没有实时增量。**上台前先跑 `npm run fund`（或换 RELAYER_KEYS）把 8 个车道补齐，再重拍 final-real 与 final-join 两张**，否则演示时一旦有人扫码点格就会当场看到红色失败提示；在那之前，v6 的讲述主线请压在 demo 模式 + 导演台 + 验证页这三张上。

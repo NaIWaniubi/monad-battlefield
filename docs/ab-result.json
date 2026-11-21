@@ -1,0 +1,31 @@
+{
+  "ts": "2026-11-21T07:36:20.842Z",
+  "mode": "DRY",
+  "reason": "合格车道（≥0.007 MON）只有 1 条，不足 2 条",
+  "usableLanes": 1,
+  "costPerTxMon": 0.0066,
+  "budgetMon": 0.025,
+  "cooldownWindowMs": 3000,
+  "rounds": {
+    "A": {
+      "strategy": "same-cell hammer (as #363-style)",
+      "taps": 20,
+      "landed": 5,
+      "rejected": 15,
+      "usGasMon": 0.033,
+      "themGasMon": 0.132,
+      "wasteMon": 0.099,
+      "real": null
+    },
+    "B": {
+      "strategy": "spread over distinct cells",
+      "taps": 20,
+      "landed": 20,
+      "rejected": 0,
+      "usGasMon": 0.132,
+      "themGasMon": 0.132,
+      "wasteMon": 0,
+      "real": null
+    }
+  }
+}
