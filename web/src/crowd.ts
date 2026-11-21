@@ -51,8 +51,8 @@ const MOOD_MUL: Record<Mood, number> = { calm: 2.2, busy: 1.0, rush: 0.45 };
 /** burst 连点间隔(秒)—— 模拟「按住不放」 */
 const BURST_GAP = 0.15;
 /** 冷却区间(秒) */
-const COOLDOWN_MIN = 8;
-const COOLDOWN_SPAN = 12;
+const COOLDOWN_MIN = 3;
+const COOLDOWN_SPAN = 4;
 /** 最后一次点击在多少秒内算「活跃」 */
 const ACTIVE_WINDOW = 10;
 /** 环形 claim 池容量(单步不会超过玩家数;2 万人 × dt≤0.05 也小于它(超出部分视觉上丢弃)) */
