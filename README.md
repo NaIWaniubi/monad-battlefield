@@ -1,6 +1,6 @@
 # MONAD BATTLEFIELD
 
-> **Live public demo:** https://naiwaniubi.github.io/monad-battlefield/ (static, honest DEMO density build). Full wall page: `.../full.html`. The interactive venue build (audience QR + sync receipts) is served through a cloudflared tunnel at the event — see docs/RUNBOOK.md.
+> **Live public demo:** https://monabattlefield.pages.dev/  ·   https://naiwaniubi.github.io/monad-battlefield/ (static, honest DEMO density build). Full wall page: `.../full.html`. The interactive venue build (audience QR + sync receipts) is served through a cloudflared tunnel at the event — see docs/RUNBOOK.md.
 
 **2,500 independent cells. Parallel payer lanes. Every claim is one on-chain transaction — and one note of sound.**
 
